@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{163D7459-A3A9-4676-B335-0745BD61D221}</ProjectGuid>
-    <RootNamespace>CUDA</RootNamespace>
+    <ProjectGuid>{157DF9B2-DCD7-4587-A5CC-96A013AE479B}</ProjectGuid>
+    <RootNamespace>cuda_blur</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -87,11 +87,6 @@
       <Command>echo copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"
 copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
-    <CudaLink>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>-Lglut32.lib</AdditionalDependencies>
-    </CudaLink>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,10 +151,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="julia.cu" />
     <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="main.cu" />
-    <CudaCompile Include="Water\water.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\book.h" />
@@ -169,9 +161,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="common\GL\glut.h" />
     <ClInclude Include="common\gl_helper.h" />
     <ClInclude Include="common\gpu_anim.h" />
-    <ClInclude Include="julia.h" />
-    <ClInclude Include="kernel.h" />
-    <ClInclude Include="Water\water.h" />
+    <ClInclude Include="dim.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

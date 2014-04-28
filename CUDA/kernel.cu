@@ -1,6 +1,8 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+#include "kernel.h"
+
 #include <stdio.h>
 
 #define N 10
@@ -12,7 +14,7 @@ void getDevicesInfos(void);
 __global__ void AddInsCUDA(int *a, int *b);
 __global__ void AddVectCUDA(int *a, int *b, int *c);
 
-int main()
+void mainkernel(void)
 {
 	/* First function test */
 	firstTest();
@@ -22,8 +24,6 @@ int main()
 
 	/* Add vector */
 	addVect();
-
-    return 0;
 }
 
 __global__ void AddInsCUDA(int *a, int *b)
@@ -34,7 +34,7 @@ __global__ void AddInsCUDA(int *a, int *b)
 
 __global__ void AddVectCUDA(int *a, int *b, int *c)
 {
-	int tid = blockIdx.x;
+	int tid = threadIdx.x;
 	if (tid < N)
 	{
 		//c[tid] = a[tid] + b[tid];
@@ -59,7 +59,7 @@ void addVect(void)
 	cudaMemcpy(devA, &a, N * sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(devB, &b, N * sizeof(int), cudaMemcpyHostToDevice);
 
-	AddVectCUDA<<<N,1>>>(devA, devB, devC);
+	AddVectCUDA<<<1, N>>>(devA, devB, devC);
 
 	cudaMemcpy(&c, devC, N * sizeof(int), cudaMemcpyDeviceToHost);
 
