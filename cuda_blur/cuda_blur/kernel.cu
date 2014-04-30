@@ -85,7 +85,6 @@ __global__ void kernelFlou(unsigned char * ptr, unsigned int * avg)
 
 int main()
 {
-
 	CPUBitmap bitmap(DIM, DIM);
 	unsigned char *dev_bitmap;
 	unsigned int *dev_avg;
@@ -105,33 +104,27 @@ int main()
 
 	// damier
 	kernelDamier<<<grid2, grid3>>>(dev_bitmap);
-
+	
+	// DEBUT calcul du temps d'exécution du floutage
+	cudaEvent_t start,stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start, 0);
+	
 	// flou
 	kernelFlou<<<grid2, grid3>>>(dev_bitmap, dev_avg);
+	
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+	float elapsedTime;
+	cudaEventElapsedTime(&elapsedTime, start, stop);
+	printf(" Temps de generation %3.1f ms\n", elapsedTime);
+	cudaEventDestroy(start);
+	cudaEventDestroy(start);
+	// FIN calcul du temps d'exécution du floutage
 
 	cudaMemcpy(bitmap.get_ptr(), dev_bitmap, bitmap.image_size(), cudaMemcpyDeviceToHost);	
-	cudaMemcpy(host_avg, dev_avg, bitmap.image_size(), cudaMemcpyDeviceToHost);	
-
-	if (DEBUG)
-	{
-		// i = (x + y * DIM / TOTO) * 4
-		int x, y, j;
-		int gridx = DIM / DIM_2;
-		for (int i = 0; i < gridx * gridx; i++)
-		{
-			y = i % gridx;
-			x = (i - y) / gridx;
-			printf("indice %d (%d, %d) : [", i, x, y);
-
-			for (j = 0; j < 4; j++)
-			{
-				if (j > 0)
-					printf(", ");
-				printf("%d", host_avg[i * 4 + j]);
-			}
-			printf("]\n");
-		}
-	}
+	cudaMemcpy(host_avg, dev_avg, bitmap.image_size(), cudaMemcpyDeviceToHost);
 
 	bitmap.display_and_exit();
 
