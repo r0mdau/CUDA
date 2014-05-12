@@ -34,8 +34,8 @@ __global__ void kernel (Sphere * tab, unsigned char *ptr) {
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
 
-	float ox = x - DIM / 2;
-	float oy = y - DIM / 2;
+	float ox = x;
+	float oy = y;
 
 	ptr[offset * 4 + 0] = 255;
 	ptr[offset * 4 + 1] = 255;
@@ -45,10 +45,10 @@ __global__ void kernel (Sphere * tab, unsigned char *ptr) {
 	for(int i = 0; i < NUM_SPHERES; i++){
 		float distance = tab[i].touche(ox, oy);
 		if(distance){
-			float attenuation = 1 - (distance / tab[i].rayon);
-			ptr[offset * 4 + 0] = tab[i].r * attenuation + attenuation * 10;
-			ptr[offset * 4 + 1] = tab[i].g * attenuation + attenuation * 10;
-			ptr[offset * 4 + 2] = tab[i].b * attenuation + attenuation * 10;
+			float attenuation = 1 - (distance / tab[i].rayon / 1.2);
+			ptr[offset * 4 + 0] = tab[i].r * attenuation;
+			ptr[offset * 4 + 1] = tab[i].g * attenuation;
+			ptr[offset * 4 + 2] = tab[i].b * attenuation;
 			ptr[offset * 4 + 3] = 255;
 		}
 	}
@@ -72,7 +72,23 @@ void mainSphere (void) {
 
 	dim3 grid(DIM/16, DIM/16);
 	dim3 threads(16, 16);
+	
+	// DEBUT calcul du temps d'exécution du floutage
+	cudaEvent_t start,stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start, 0);
+
 	kernel<<<grid, threads>>>(scene, dev_bitmap);
+
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+	float elapsedTime;
+	cudaEventElapsedTime(&elapsedTime, start, stop);
+	printf(" Temps de generation %3.1f ms\n", elapsedTime);
+	cudaEventDestroy(start);
+	cudaEventDestroy(start);
+	// FIN calcul du temps d'exécution du floutage
 
 	cudaMemcpy(bitmap.get_ptr(), dev_bitmap, bitmap.image_size(), cudaMemcpyDeviceToHost);	
 
