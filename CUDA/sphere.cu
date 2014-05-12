@@ -10,37 +10,7 @@
 #include "sphere.h"
 
 #define DIM 512
-#define NUM_SPHERES 30
-
-struct cuComplex {
-	float r;
-	float i;
-	__device__ cuComplex (float a, float b) : r(a), i(b){}
-	__device__ float magnitude2(void) { return r * r + i * i; }
-	__device__ cuComplex operator*(const cuComplex& a) {
-		return cuComplex(r * a.r - i * a.i, i * a.r + r*a.i);
-	}
-	__device__ cuComplex operator+(const cuComplex& a) {
-		return cuComplex(r + a.r, i + a.i);
-	}
-};
-
-__device__ int julia (int x, int y ) {
-	const float scale = 1.5;
-	float jx = scale * (float)(DIM/2 - x)/(DIM / 2);
-	float jy = scale * (float)(DIM/2 - y)/(DIM / 2);
-
-	cuComplex c(-0.9, 0.156);
-	cuComplex a(jx, jy);
-
-	for (int i = 0; i < 200; i++) {
-		a = a * a + c;
-		if (a.magnitude2() > 1000)
-			return 0;		
-	}
-
-	return 1;
-}
+#define NUM_SPHERES 300
 
 struct Sphere{
 	int r, g ,b;
@@ -67,9 +37,9 @@ __global__ void kernel (Sphere * tab, unsigned char *ptr) {
 	float ox = x - DIM / 2;
 	float oy = y - DIM / 2;
 
-	ptr[offset * 4 + 0] = 0;
-	ptr[offset * 4 + 1] = 0;
-	ptr[offset * 4 + 2] = 0;
+	ptr[offset * 4 + 0] = 255;
+	ptr[offset * 4 + 1] = 255;
+	ptr[offset * 4 + 2] = 255;
 	ptr[offset * 4 + 3] = 255;
 
 	for(int i = 0; i < NUM_SPHERES; i++){
@@ -90,10 +60,9 @@ void mainSphere (void) {
 	unsigned char *dev_bitmap;
 	Sphere *scene;
 
-	struct Sphere sphere1, sphere2, sphere3;
 	Sphere tab[NUM_SPHERES];
 	for(int i = 0; i < NUM_SPHERES; i++){
-		tab[i].init(rand() % 256, rand() % 256, rand() % 256, rand() % DIM, rand() % DIM, rand() % DIM, 50);
+		tab[i].init(rand() % 256, rand() % 256, rand() % 256, rand() % DIM, rand() % DIM, rand() % DIM, rand () % 50);
 	}
 
 	cudaMalloc( (void**)&scene, sizeof(Sphere) * NUM_SPHERES);
@@ -110,4 +79,5 @@ void mainSphere (void) {
 	bitmap.display_and_exit();
 
 	cudaFree(dev_bitmap);
+	cudaFree(scene);
 }
