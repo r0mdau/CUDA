@@ -156,7 +156,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="julia.cu" />
+    <CudaCompile Include="sphere.cu" />
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="main.cu" />
     <CudaCompile Include="Water\water.cu" />
@@ -169,7 +169,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     <ClInclude Include="common\GL\glut.h" />
     <ClInclude Include="common\gl_helper.h" />
     <ClInclude Include="common\gpu_anim.h" />
-    <ClInclude Include="julia.h" />
+    <ClInclude Include="sphere.h" />
     <ClInclude Include="kernel.h" />
     <ClInclude Include="Water\water.h" />
   </ItemGroup>
